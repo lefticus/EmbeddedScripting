@@ -584,14 +584,16 @@ class RubyInterpreter
     }
 
   public:
-    explicit RubyInterpreter(const std::string &t_includePath)
+    explicit RubyInterpreter(const std::vector<std::string> &t_includePaths)
     {
 
 
       // set load paths
       std::vector<std::string> rubyArgs;
 
-      addIncludePath(rubyArgs, t_includePath);
+      for (const auto &p : t_includePaths) {
+        addIncludePath(rubyArgs, p);
+      }
 
       rubyArgs.emplace_back("-EUTF-8");
 

@@ -60,16 +60,17 @@ int main(int argc, char *argv[])
   }
 
   std::cout << "***** Initializing RubyInterpreter Wrapper *****\n";
-  RubyInterpreter rubyInterpreter("vfs");
+  RubyInterpreter rubyInterpreter({});
 
   std::cout << "***** Initializing Embedded Ruby Module *****\n";
   Init_EmbeddedScripting();
 
+  std::cout << "***** Calling Embedded Module Function *****\n";
+  rubyInterpreter.evalString("puts(EmbeddedScripting::helloworld())");
 
   std::cout << "***** Shimming Our Kernel::require method *****\n";
   rubyInterpreter.evalString(R"(
 module Kernel
-
   if defined?(gem_original_require) then
     # Ruby ships with a custom_require, override its require
     remove_method :require
@@ -81,14 +82,17 @@ module Kernel
 
   def require path
     puts "Requiring #{path}"
-    return gem_original_require path
+    if EmbeddedScripting::hasFile(path) then
+      puts "It's an embedded file!"
+      return eval(EmbeddedScripting::getFileAsString(path))
+    else
+      return gem_original_require path
+    end
   end
 end
 )");
 
 
-  std::cout << "***** Calling Embedded Module Function *****\n";
-  rubyInterpreter.evalString("puts(EmbeddedScripting::helloworld())");
 
   std::cout << "***** Requiring JSON *****\n";
   rubyInterpreter.evalString("require 'json'");
@@ -103,5 +107,7 @@ end
     std::cout << "Embedded file: '" << f.first << "': " << f.second.first << " bytes\n";
   }
 
+  std::cout << "***** Exercising our require method *****\n";
+  rubyInterpreter.evalString(R"(require 'myvfs/test.rb')");
 
 }

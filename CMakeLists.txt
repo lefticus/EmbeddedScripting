@@ -100,8 +100,8 @@ endfunction()
 
 
 embed_files(
-  "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp" "main.cpp"
-  "${CMAKE_CURRENT_SOURCE_DIR}/RubyInterpreter.hpp" "some/new/loc/RubyInterpreter.hpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/test.rb" "myvfs/test.rb"
+  "${CMAKE_CURRENT_SOURCE_DIR}/test2.rb" "myvfs/test2.rb"
   
   )
 

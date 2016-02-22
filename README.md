@@ -215,6 +215,7 @@ module Kernel
 
   def require path
     puts "Requiring #{path}"
+    # Actually do something here
     return gem_original_require path
   end
 end
@@ -225,9 +226,6 @@ can be intercepted as well.
 
 ###### Issues
 
-The above example does not demonstrate actually loading the file and evaluating it. That part should not be difficult.
-The hard part is what to do if the found file is a dynamic module? 
-
-The implementation would need to somehow implement the mechanism of `LoadLibrary` on Windows and `dlopen` on UNIX to be able to 
-load a shared object from inside of the existing executable.
+ * What to do if the found file is a dynamic module? The implementation would need to somehow implement the mechanism of `LoadLibrary` on Windows and `dlopen` on UNIX to be able to load a shared object from inside of the existing executable.
+ * This code can only execute after the ruby interpreter has been initialized, so it cannot be used to load the ruby gems modules, for instance
 
