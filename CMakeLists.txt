@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.8.6)
 
 project (EmbeddedScripting CXX)
 
-find_package(Ruby 1.9 REQUIRED)
+ find_package(Ruby 1.9 REQUIRED)
 find_package(SWIG 3.0.8 REQUIRED)
 
 include(UseSWIG)
@@ -113,7 +113,7 @@ set_source_files_properties(EmbeddedScripting.i
   )
 
 if (UNIX)
-  set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra")
+  set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -pthread ")
 endif()
 
 include_directories(${RUBY_INCLUDE_DIR} ${RUBY_CONFIG_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
@@ -144,19 +144,15 @@ add_custom_command(
   DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/EmbeddedScripting.i"
 )
 
-add_library(EmbeddedScriptingRUBY
-  OBJECT
-  "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedScriptingRUBY_wrap.cxx"
-  )
 
 add_executable(EmbeddedScripting
  "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx"
- $<TARGET_OBJECTS:EmbeddedScriptingRUBY>
  main.cpp
  "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.cpp"
+  "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedScriptingRUBY_wrap.cxx"
  )
 
-target_link_libraries(EmbeddedScripting ${RUBY_LIBRARY})
+target_link_libraries(EmbeddedScripting ${RUBY_LIBRARY} "dl" "crypt")
 
 
 
