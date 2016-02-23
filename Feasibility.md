@@ -1,6 +1,6 @@
-# Feasibility Report
-
 Start by reading the [full report](/README.md).
+
+# Feasibility Report
 
 It is possible to create a C++ application that contains an embedded ruby interpreter and all necessary files.
 
