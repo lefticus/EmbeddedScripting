@@ -224,8 +224,41 @@ end
 This version would likely need to be executed before the `rubygem` module is loaded so that the load for it
 can be intercepted as well.
 
-###### Issues
+##### Issues
 
  * What to do if the found file is a dynamic module? The implementation would need to somehow implement the mechanism of `LoadLibrary` on Windows and `dlopen` on UNIX to be able to load a shared object from inside of the existing executable.
  * This code can only execute after the ruby interpreter has been initialized, so it cannot be used to load the ruby gems modules, for instance
+
+
+#### Actually Mount Embedded Files As A Virtual FS
+
+The concept is to tell the operating system to create embedded files as if they were a real filesystem so that they would be visible
+to all applications.
+
+On Linux and MacOS this could be implemented using the [user mode filesystem](https://en.wikipedia.org/wiki/Filesystem_in_Userspace) driver 
+[FUSE](https://github.com/libfuse/libfuse). On Windows a similar approach could be taken with [dokan](http://dokan-dev.github.io/).
+
+Unfortunately using dokan on Windows would require the user to install an OS driver. So this option was ruled out and not fully explored.
+
+
+#### Extract Embedded Files To Actual Filesystem
+
+This is the most straightforward and least error prone option
+
+ 1. On start of executable, extract files to temporary location
+ 2. Initialize ruby interpreter with temporary location as an inlude path
+ 3. Perform work
+ 4. Delete temporary location when exitting application
+
+### Chosen Solution
+
+As outlined in the various possibilities, many of these solutions where experimented with. This codebase contains enough
+examples and information to more fully explore most of them.
+
+The recommended solution is the final option, extracting the embedded files to the local filesystem.
+
+ * It's the most versatile, since it requires no special cross-platform considerations
+ * It allows for possible compression of embedded files
+ * It occurs before the Ruby interpreter is initialized, so core Ruby libraries can be stored
+
 
