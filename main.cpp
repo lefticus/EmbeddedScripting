@@ -59,8 +59,17 @@ int main(int argc, char *argv[])
     ruby_init();
   }
 
+
+  std::cout << "***** Extracting Files *****\n";
+  const auto filepath = embedded_files::extractAll();
+
+
   std::cout << "***** Initializing RubyInterpreter Wrapper *****\n";
-  RubyInterpreter rubyInterpreter({});
+  RubyInterpreter rubyInterpreter({filepath->dir().string()});
+
+  std::cout << "***** Exercising our search path *****\n";
+  rubyInterpreter.evalString(R"(require 'extracted/test3.rb')");
+
 
   std::cout << "***** Initializing Embedded Ruby Module *****\n";
   Init_EmbeddedScripting();
@@ -109,5 +118,6 @@ end
 
   std::cout << "***** Exercising our require method *****\n";
   rubyInterpreter.evalString(R"(require 'myvfs/test.rb')");
+
 
 }

@@ -2,8 +2,11 @@ cmake_minimum_required (VERSION 2.8.6)
 
 project (EmbeddedScripting CXX)
 
- find_package(Ruby 1.9 REQUIRED)
-find_package(SWIG 3.0.8 REQUIRED)
+find_package(Ruby 1.9 REQUIRED)
+find_package(SWIG REQUIRED)
+
+# boost is only needed for the extraction stuff. It's easier that way
+find_package(Boost COMPONENTS filesystem system)
 
 include(UseSWIG)
 
@@ -102,6 +105,7 @@ endfunction()
 embed_files(
   "${CMAKE_CURRENT_SOURCE_DIR}/test.rb" "myvfs/test.rb"
   "${CMAKE_CURRENT_SOURCE_DIR}/test2.rb" "myvfs/test2.rb"
+  "${CMAKE_CURRENT_SOURCE_DIR}/test3.rb" "extracted/test3.rb"
   
   )
 
@@ -152,7 +156,8 @@ add_executable(EmbeddedScripting
   "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedScriptingRUBY_wrap.cxx"
  )
 
-target_link_libraries(EmbeddedScripting ${RUBY_LIBRARY} "dl" "crypt")
+target_link_libraries(EmbeddedScripting ${Boost_LIBRARIES} ${RUBY_LIBRARY}  "dl" "crypt")
+
 
 
 

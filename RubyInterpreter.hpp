@@ -591,12 +591,12 @@ class RubyInterpreter
       // set load paths
       std::vector<std::string> rubyArgs;
 
-      for (const auto &p : t_includePaths) {
-        addIncludePath(rubyArgs, p);
-      }
 
       rubyArgs.emplace_back("-EUTF-8");
 
+      for (const auto &p : t_includePaths) {
+        addIncludePath(rubyArgs, p);
+      }
 
       // and now give the interpreter something to parse, so that it doesn't sit
       // waiting on stdin from us
