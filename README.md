@@ -1,3 +1,5 @@
+See also the [Feasibility Report](/Feasibility.md).
+
 # Goals
 
  * Provide a single executable that contains an embedded ruby interpreter and all requirements
