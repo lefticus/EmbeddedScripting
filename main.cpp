@@ -1,4 +1,4 @@
-//#include "RubyInterpreter.hpp"
+#include "RubyInterpreter.hpp"
 #include "embedded_files.hpp"
 
 #include <iostream>

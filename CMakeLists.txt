@@ -173,7 +173,7 @@ add_custom_command(
 
 
 add_executable(EmbeddedScripting
- # "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx"
+ "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx"
  main.cpp
  # RubyException.hpp
  # RubyInterpreter.hpp
