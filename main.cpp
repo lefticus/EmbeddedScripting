@@ -1,4 +1,3 @@
-#include "RubyInterpreter.hpp"
 #include "embedded_files.hpp"
 
 #include <iostream>
@@ -7,6 +6,9 @@
 #include <dlfcn.h>
 #include <dirent.h>
 #endif
+
+
+#include "RubyInterpreter.hpp"
 
 
 FILE *(*origfopen)(const char *, const char *);

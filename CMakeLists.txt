@@ -5,11 +5,10 @@ project (EmbeddedScripting CXX)
 find_package(Ruby 1.9 REQUIRED)
 find_package(SWIG REQUIRED)
 
-# boost is only needed for the extraction stuff. It's easier that way
 
-include(UseSWIG)
-
-
+if (${MSVC_VERSION} STREQUAL "1900")
+  add_definitions(/DHAVE_STRUCT_TIMESPEC=1)
+endif()
 
 
 function(embed_files )

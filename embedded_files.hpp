@@ -3,8 +3,14 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+
+#ifdef _MSC_VER
+#include <direct.h>
+#else
 #include <sys/stat.h>
 #include <sys/types.h>
+#endif
+
 #include <memory>
 #include <vector>
 
@@ -28,7 +34,7 @@ namespace embedded_files {
 
 
     const auto create_dirs = [](const std::string &t_path) {
-      const auto paths = [](const std::string &t_path) {
+      const auto paths = [](const std::string &t_paths) {
         std::vector<std::string> subpaths;
         const auto handle_subpath = [&subpaths](std::string &t_subpath) {
           if (!t_subpath.empty()) {
@@ -38,7 +44,7 @@ namespace embedded_files {
         };
 
         std::string curstring = "";
-        for (const auto c : t_path) {
+        for (const auto c : t_paths) {
           if (c != '/') {
             curstring.push_back(c);
           } else {
@@ -55,7 +61,11 @@ namespace embedded_files {
       for (const auto &p : paths) {
         if (!curpath.empty()) curpath += '/';
         curpath += p;
+#ifdef _MSC_VER
+        _mkdir(curpath.c_str());
+#else
         mkdir(curpath.c_str(), 0777);
+#endif
       }
     };
 
