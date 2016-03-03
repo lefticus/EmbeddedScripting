@@ -1,3 +1,4 @@
+#include "RubyInterpreter.hpp"
 #include "embedded_files.hpp"
 
 #include <iostream>
@@ -5,10 +6,11 @@
 #ifndef _MSC_VER
 #include <dlfcn.h>
 #include <dirent.h>
+#else
+#include <windows.h>
 #endif
 
 
-#include "RubyInterpreter.hpp"
 
 
 FILE *(*origfopen)(const char *, const char *);
@@ -19,6 +21,16 @@ int (*origstat)(const char *, struct stat *);
 extern "C" {
 
 #ifndef _MSC_VER
+  FILE *fopen(const char *path, const char *mode) {
+    std::cout << "fopen: " << path << '\n';
+    return origfopen(path, mode);
+  }
+
+  int read(int fd, void *buf, size_t count) {
+    std::cout << "(" << fd << ") read: " << count << '\n';
+    return origread(fd, buf, count);
+  }
+
   int open(const char *path, int flags) {
     const auto id = origopen(path, flags);
     std::cout << "(" << id << ") open: " << path << '\n';
@@ -28,16 +40,6 @@ extern "C" {
   int stat(const char *path, struct stat *buf) {
     std::cout << "stat: " << path << '\n';
     return origstat(path, buf);
-  }
-
-  FILE *fopen(const char *path, const char *mode) {
-    std::cout << "fopen: " << path << '\n';
-    return origfopen(path, mode);
-  }
-
-  ssize_t read(int fd, void *buf, size_t count) {
-    std::cout << "(" << fd << ") read: " << count << '\n';
-    return origread(fd, buf, count);
   }
 #endif
 
@@ -97,6 +99,8 @@ int main(int argc, char *argv[])
   std::cout << "***** Extracting Files *****\n";
   const auto filepath = extractAll();
 
+  //std::vector<char> cwd(256);
+  //getcwd(&cwd.front(), cwd.size());
 
   std::cout << "***** Initializing RubyInterpreter Wrapper *****\n";
   RubyInterpreter rubyInterpreter({filepath->dir()});

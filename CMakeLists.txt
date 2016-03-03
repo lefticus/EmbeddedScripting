@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 2.8.6)
 
 project (EmbeddedScripting CXX)
 
+find_program(SWIG_EXECUTABLE NAMES swig3.0 swig2.0 swig HINTS "c:/swigwin-3.0.8")
 find_package(SWIG REQUIRED)
 find_package(Git)
 get_filename_component(GIT_DIR "${GIT_EXECUTABLE}" DIRECTORY)
@@ -21,18 +22,18 @@ if(WIN32)
     execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/ruby)
     execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_BINARY_DIR}/ruby-2.0.0.zip
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ruby)
-    execute_process(COMMAND "${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/x64-mingw32.patch"
+    execute_process(COMMAND ${PATCH_EXE} -p1 -i ${CMAKE_SOURCE_DIR}/x64-mingw32.patch
                     WORKING_DIRECTORY ${RUBY_BASE_DIR})
     set(RUBY_DLL x64-msvcrt-ruby200.dll)
     set(RUBY_LIB_NAME libx64-msvcrt-ruby200.dll.a)
   else()
     file(DOWNLOAD http://openstudio-resources.s3.amazonaws.com/dependencies/ruby-2.0.0-p645-aws-win32.zip ${CMAKE_BINARY_DIR}/ruby-2.0.0.zip
       EXPECTED_MD5 712839ed5e7c21043026420ddd82b88c)
-    set(RUBY_BASE_DIR ${CMAKE_BINARY_DIR}/ruby/ruby-2.0.0-aws-win64)
+    set(RUBY_BASE_DIR ${CMAKE_BINARY_DIR}/ruby/ruby-2.0.0-aws-win32)
     execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/ruby)
     execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_BINARY_DIR}/ruby-2.0.0.zip
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ruby)
-    execute_process(COMMAND "${PATCH_EXE} -p1 < ${CMAKE_SOURCE_DIR}/i386-mingw32.patch"
+    execute_process(COMMAND ${PATCH_EXE} -p1 -i ${CMAKE_SOURCE_DIR}/i386-mingw32.patch
                     WORKING_DIRECTORY ${RUBY_BASE_DIR})
     set(RUBY_DLL msvcrt-ruby200.dll)
     set(RUBY_LIB_NAME libmsvcrt-ruby200.dll.a)
@@ -41,24 +42,9 @@ if(WIN32)
   set(RUBY_EXECUTABLE ${RUBY_BASE_DIR}/bin/ruby.exe)
   set(RUBY_DLLPATH "${RUBY_BASE_DIR}/bin/${RUBY_DLL}")
   set(RUBY_LIBRARY "${RUBY_BASE_DIR}/lib/${RUBY_LIB_NAME}")
-
-  find_package(Ruby 1.9 REQUIRED)
-
-  get_filename_component(RUBY_EXECUTABLE_DIR "${RUBY_EXECUTABLE}" DIRECTORY)
-  if(CMAKE_CL_64)
-    set(RUBY_DLL x64-msvcrt-ruby200.dll)
-    set(RUBY_DLLPATH "${RUBY_EXECUTABLE_DIR}/${RUBY_DLL}")
-    set(RUBY_LIBRARY "${RUBY_POSSIBLE_LIB_DIR}/libx64-msvcrt-ruby200.dll.a")
-  else()
-    set(RUBY_DLL msvcrt-ruby200.dll)
-    set(RUBY_DLLPATH "${RUBY_EXECUTABLE_DIR}/${RUBY_DLL}")
-    set(RUBY_LIBRARY "${RUBY_POSSIBLE_LIB_DIR}/libmsvcrt-ruby200.dll.a")
-  endif()
-
-else()
-  find_package(Ruby 1.9 REQUIRED)
 endif()
 
+find_package(Ruby 1.9 REQUIRED)
 
 function(embed_files )
   set(OUTFILE "${CMAKE_BINARY_DIR}/embedded_files.cpp")

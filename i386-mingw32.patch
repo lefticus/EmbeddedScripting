@@ -310,7 +310,7 @@ diff --git a/include/ruby-2.0.0/i386-mingw32/ruby/config.h b/include/ruby-2.0.0/
 -#define FILE_COUNT _cnt
 -#define FILE_READPTR _ptr
 -#define SIZEOF_STRUCT_STAT_ST_INO 2
-+#define inline __inline
++//#define inline __inline
 +#define NEED_IO_SEEK_BETWEEN_RW 1
  #define STACK_GROW_DIRECTION -1
 -#define DLEXT_MAXLEN 3
