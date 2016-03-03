@@ -45,23 +45,21 @@ extern "C" {
 class Temp_Dir
 {
   public:
-    Temp_Dir()
-    {
-      boost::filesystem::create_directories(dirpath);
-    }
+
+    /// \todo add default/deleted  deault operations, but MSVC 2013 barfs on some of them
 
     ~Temp_Dir()
     {
-      boost::filesystem::remove_all(boost::filesystem::path(dirpath));
+      /// \todo actually clean up temp path
     }
 
-    boost::filesystem::path dir() const {
-      return boost::filesystem::path(dirpath);
+    std::string dir() const {
+      return dirpath;
     }
 
 
   private:
-    boost::filesystem::path dirpath = boost::filesystem::temp_directory_path() / boost::filesystem::unique_path();
+    std::string dirpath = "tempextractedfiles";
 };
 
 inline std::unique_ptr<Temp_Dir> extractAll() {
@@ -99,7 +97,7 @@ int main(int argc, char *argv[])
 
 
   std::cout << "***** Initializing RubyInterpreter Wrapper *****\n";
-  RubyInterpreter rubyInterpreter({filepath->dir().string()});
+  RubyInterpreter rubyInterpreter({filepath->dir()});
 
   std::cout << "***** Exercising our search path *****\n";
   rubyInterpreter.evalString(R"(require 'extracted/test3.rb')");

@@ -7,12 +7,6 @@ find_package(SWIG REQUIRED)
 
 # boost is only needed for the extraction stuff. It's easier that way
 
-if (APPLE OR WIN32)
-  set(Boost_USE_STATIC_LIBS ON)
-endif()
-
-find_package(Boost COMPONENTS filesystem system)
-
 include(UseSWIG)
 
 
@@ -141,7 +135,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LINKER_FLAGS}")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LINKER_FLAGS}")
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${LINKER_FLAGS}")
 
-include_directories(${RUBY_INCLUDE_DIR} ${RUBY_CONFIG_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${Boost_INCLUDE_DIR})
+include_directories(${RUBY_INCLUDE_DIR} ${RUBY_CONFIG_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} )
 
 
 add_custom_command(
@@ -184,9 +178,9 @@ add_executable(EmbeddedScripting
 
 
 if (NOT MSVC)
-  target_link_libraries(EmbeddedScripting ${Boost_LIBRARIES} ${RUBY_LIBRARY}  "dl" "crypt")
+  target_link_libraries(EmbeddedScripting ${RUBY_LIBRARY}  "dl" "crypt")
 else()
-  target_link_libraries(EmbeddedScripting ${Boost_LIBRARIES} ${RUBY_LIBRARY} )
+  target_link_libraries(EmbeddedScripting ${RUBY_LIBRARY} )
 endif()
 
 
