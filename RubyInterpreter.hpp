@@ -1024,6 +1024,9 @@ class RubyInterpreter
 };
 
 
+#if 0
+
+
 #ifdef _MSC_VER
 
 
@@ -1560,5 +1563,6 @@ class RubyInterpreter
 #endif
 #endif
 
+#endif
 
 #endif // UTILITIES_CORE_RUBYINTERPRETER_HPP

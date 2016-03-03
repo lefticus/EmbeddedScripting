@@ -173,20 +173,22 @@ add_custom_command(
 
 
 add_executable(EmbeddedScripting
- "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx"
+ # "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx"
  main.cpp
- RubyException.hpp
- RubyInterpreter.hpp
+ # RubyException.hpp
+ # RubyInterpreter.hpp
  embedded_files.hpp
  "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.cpp"
-  "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedScriptingRUBY_wrap.cxx"
+ #  "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedScriptingRUBY_wrap.cxx"
  )
 
 
 if (NOT MSVC)
-  target_link_libraries(EmbeddedScripting ${Boost_LIBRARIES} ${RUBY_LIBRARY}  "dl" "crypt")
+  #  target_link_libraries(EmbeddedScripting ${Boost_LIBRARIES} ${RUBY_LIBRARY}  "dl" "crypt")
+  target_link_libraries(EmbeddedScripting ${Boost_LIBRARIES}  "dl" "crypt")
 else()
-  target_link_libraries(EmbeddedScripting ${Boost_LIBRARIES} ${RUBY_LIBRARY} )
+  #  target_link_libraries(EmbeddedScripting ${Boost_LIBRARIES} ${RUBY_LIBRARY} )
+  target_link_libraries(EmbeddedScripting ${Boost_LIBRARIES} )
 endif()
 
 

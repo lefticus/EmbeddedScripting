@@ -1,4 +1,4 @@
-#include "RubyInterpreter.hpp"
+//#include "RubyInterpreter.hpp"
 #include "embedded_files.hpp"
 
 #include <iostream>
@@ -11,7 +11,7 @@
 
 FILE *(*origfopen)(const char *, const char *);
 int (*origopen)(const char *, int);
-ssize_t (*origread)(int fd, void *, size_t);
+//ssize_t (*origread)(int fd, void *, size_t);
 int (*origstat)(const char *, struct stat *);
 
 extern "C" {
@@ -39,7 +39,7 @@ extern "C" {
   }
 #endif
 
-  void Init_EmbeddedScripting(void);
+//  void Init_EmbeddedScripting(void);
 }
 
 class Temp_Dir
@@ -86,24 +86,26 @@ int main(int argc, char *argv[])
   origstat = (int (*)(const char *, struct stat *))(dlsym(RTLD_NEXT, "stat"));
 #endif
 
+  /*
   std::cout << "***** Initializing ruby *****\n";
   ruby_sysinit(&argc, &argv);
   {
     RUBY_INIT_STACK;
     ruby_init();
   }
-
+  */
 
   std::cout << "***** Extracting Files *****\n";
   const auto filepath = extractAll();
 
 
+/*
   std::cout << "***** Initializing RubyInterpreter Wrapper *****\n";
   RubyInterpreter rubyInterpreter({filepath->dir().string()});
 
   std::cout << "***** Exercising our search path *****\n";
   rubyInterpreter.evalString(R"(require 'extracted/test3.rb')");
-
+  
 
   std::cout << "***** Initializing Embedded Ruby Module *****\n";
   Init_EmbeddedScripting();
@@ -139,7 +141,7 @@ end
 
   std::cout << "***** Requiring JSON *****\n";
   rubyInterpreter.evalString("require 'json'");
-
+  */
 
 
 
@@ -150,8 +152,9 @@ end
     std::cout << "Embedded file: '" << f.first << "': " << f.second.first << " bytes\n";
   }
 
+  /*
   std::cout << "***** Exercising our require method *****\n";
   rubyInterpreter.evalString(R"(require 'myvfs/test.rb')");
-
+  */
 
 }
