@@ -2,17 +2,21 @@
 #include "embedded_files.hpp"
 
 #include <iostream>
+
+#ifndef _MSC_VER
 #include <dlfcn.h>
 #include <dirent.h>
+#endif
 
 
 FILE *(*origfopen)(const char *, const char *);
 int (*origopen)(const char *, int);
 ssize_t (*origread)(int fd, void *, size_t);
 int (*origstat)(const char *, struct stat *);
-DIR* (*origopendir)(const char *);
 
 extern "C" {
+
+#ifndef _MSC_VER
   int open(const char *path, int flags) {
     const auto id = origopen(path, flags);
     std::cout << "(" << id << ") open: " << path << '\n';
@@ -33,11 +37,7 @@ extern "C" {
     std::cout << "(" << fd << ") read: " << count << '\n';
     return origread(fd, buf, count);
   }
-
-  DIR *opendir(const char *path) {
-    std::cout << "opendir: " << path << '\n';
-    return origopendir(path);
-  }
+#endif
 
   void Init_EmbeddedScripting(void);
 }
@@ -47,24 +47,21 @@ class Temp_Dir
   public:
     Temp_Dir()
     {
-      // Note this will need to be ported to other operating systems
-      // it is only tested on linux at the moment due to the use of
-      // mkdtemp
-      mkdtemp(&dirname.front());
+      boost::filesystem::create_directories(dirpath);
     }
 
     ~Temp_Dir()
     {
-      boost::filesystem::remove_all(boost::filesystem::path(dirname));
+      boost::filesystem::remove_all(boost::filesystem::path(dirpath));
     }
 
     boost::filesystem::path dir() const {
-      return boost::filesystem::path(dirname);
+      return boost::filesystem::path(dirpath);
     }
 
 
   private:
-    std::string dirname = "/tmp/embeddedXXXXXX";
+    boost::filesystem::path dirpath = boost::filesystem::temp_directory_path() / boost::filesystem::unique_path();
 };
 
 inline std::unique_ptr<Temp_Dir> extractAll() {
@@ -81,11 +78,13 @@ inline std::unique_ptr<Temp_Dir> extractAll() {
 int main(int argc, char *argv[])
 {
   std::cout << "***** Initializing file function pointers *****\n";
+
+#ifndef _MSC_VER
   origfopen = (FILE *(*)(const char *, const char *))(dlsym(RTLD_NEXT, "fopen"));
   origopen = (int (*)(const char *, int))(dlsym(RTLD_NEXT, "open"));
   origread = (ssize_t (*)(int, void*, size_t))(dlsym(RTLD_NEXT, "read"));
   origstat = (int (*)(const char *, struct stat *))(dlsym(RTLD_NEXT, "stat"));
-  origopendir = (DIR* (*)(const char *))(dlsym(RTLD_NEXT, "opendir"));
+#endif
 
   std::cout << "***** Initializing ruby *****\n";
   ruby_sysinit(&argc, &argv);

@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <map>
 #include <string>
+#include <iostream>
 #include <boost/filesystem.hpp>
 #include <fstream>
 
@@ -28,6 +29,5 @@ namespace embedded_files {
     ofs.write(reinterpret_cast<const char *>(f.second), f.first);
     std::cout << "***** Extracted " << t_filename << " to: " << p.string() << " *****\n";
   }
-
 
 }

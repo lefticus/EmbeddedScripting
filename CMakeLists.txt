@@ -6,6 +6,11 @@ find_package(Ruby 1.9 REQUIRED)
 find_package(SWIG REQUIRED)
 
 # boost is only needed for the extraction stuff. It's easier that way
+
+if (APPLE OR WIN32)
+  set(Boost_USE_STATIC_LIBS ON)
+endif()
+
 find_package(Boost COMPONENTS filesystem system)
 
 include(UseSWIG)
@@ -136,7 +141,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LINKER_FLAGS}")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LINKER_FLAGS}")
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${LINKER_FLAGS}")
 
-include_directories(${RUBY_INCLUDE_DIR} ${RUBY_CONFIG_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${RUBY_INCLUDE_DIR} ${RUBY_CONFIG_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${Boost_INCLUDE_DIR})
 
 
 add_custom_command(
@@ -170,12 +175,44 @@ add_custom_command(
 add_executable(EmbeddedScripting
  "${CMAKE_CURRENT_BINARY_DIR}/SWIGRubyRuntime.hxx"
  main.cpp
+ RubyException.hpp
+ RubyInterpreter.hpp
+ embedded_files.hpp
  "${CMAKE_CURRENT_BINARY_DIR}/embedded_files.cpp"
   "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedScriptingRUBY_wrap.cxx"
  )
 
-target_link_libraries(EmbeddedScripting ${Boost_LIBRARIES} ${RUBY_LIBRARY}  "dl" "crypt")
+
+if (NOT MSVC)
+  target_link_libraries(EmbeddedScripting ${Boost_LIBRARIES} ${RUBY_LIBRARY}  "dl" "crypt")
+else()
+  target_link_libraries(EmbeddedScripting ${Boost_LIBRARIES} ${RUBY_LIBRARY} )
+endif()
+
+
+
+if(MSVC)
+  get_filename_component(RUBY_EXECUTABLE_DIR "${RUBY_EXECUTABLE}" DIRECTORY)
+  if(CMAKE_CL_64)
+    set(RUBY_DLL x64-msvcrt-ruby200.dll)
+    set(RUBY_DLLPATH "${RUBY_EXECUTABLE_DIR}/${RUBY_DLL}")
+    set(RUBY_LIBRARY "${RUBY_POSSIBLE_LIB_DIR}/libx64-msvcrt-ruby200.dll.a")
+  else()
+    set(RUBY_DLL msvcrt-ruby200.dll)
+    set(RUBY_DLLPATH "${RUBY_EXECUTABLE_DIR}/${RUBY_DLL}")
+    set(RUBY_LIBRARY "${RUBY_POSSIBLE_LIB_DIR}/libmsvcrt-ruby200.dll.a")
+  endif()
 
 
 
 
+  execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/Release)
+  execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/Debug)
+  execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/RelWithDebInfo)
+  execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/MinSizeRel)
+
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy "${RUBY_DLLPATH}" "${CMAKE_BINARY_DIR}/Release/${RUBY_DLL}")
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy "${RUBY_DLLPATH}" "${CMAKE_BINARY_DIR}/Debug/${RUBY_DLL}")
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy "${RUBY_DLLPATH}" "${CMAKE_BINARY_DIR}/RelWithDebInfo/${RUBY_DLL}")
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy "${RUBY_DLLPATH}" "${CMAKE_BINARY_DIR}/MinSizeRel/${RUBY_DLL}")
+endif()
