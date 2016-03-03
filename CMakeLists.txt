@@ -9,7 +9,7 @@ get_filename_component(GIT_DIR "${GIT_EXECUTABLE}" DIRECTORY)
 find_program(PATCH_EXE patch HINTS "${GIT_DIR}" "${GIT_DIR}/../bin/" "${GIT_DIR}/../usr/bin/")
 
 
-if (${MSVC_VERSION} STREQUAL "1900")
+if ("${MSVC_VERSION}" STREQUAL "1900")
   add_definitions(/DHAVE_STRUCT_TIMESPEC=1)
 endif()
 
