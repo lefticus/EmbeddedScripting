@@ -42,6 +42,41 @@ extern "C" {
   void Init_EmbeddedScripting(void);
 }
 
+class Temp_Dir
+{
+  public:
+    Temp_Dir()
+    {
+      // Note this will need to be ported to other operating systems
+      // it is only tested on linux at the moment due to the use of
+      // mkdtemp
+      mkdtemp(&dirname.front());
+    }
+
+    ~Temp_Dir()
+    {
+      boost::filesystem::remove_all(boost::filesystem::path(dirname));
+    }
+
+    boost::filesystem::path dir() const {
+      return boost::filesystem::path(dirname);
+    }
+
+
+  private:
+    std::string dirname = "/tmp/embeddedXXXXXX";
+};
+
+inline std::unique_ptr<Temp_Dir> extractAll() {
+  auto d = std::unique_ptr<Temp_Dir>(new Temp_Dir());
+
+  const auto fs = embedded_files::files();
+  for (const auto &f : fs) {
+    embedded_files::extractFile(f.first, d->dir());
+  }
+
+  return d;
+}
 
 int main(int argc, char *argv[])
 {
@@ -61,7 +96,7 @@ int main(int argc, char *argv[])
 
 
   std::cout << "***** Extracting Files *****\n";
-  const auto filepath = embedded_files::extractAll();
+  const auto filepath = extractAll();
 
 
   std::cout << "***** Initializing RubyInterpreter Wrapper *****\n";

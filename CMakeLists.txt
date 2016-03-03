@@ -118,17 +118,25 @@ set_source_files_properties(EmbeddedScripting.i
 
 if (UNIX)
   set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -pthread ")
+
+  option(ENABLE_ADDRESS_SANITIZER "Enable address sanitizer testing in gcc/clang" FALSE)
+  if(ENABLE_ADDRESS_SANITIZER)
+    add_definitions(-fsanitize=address -g)
+    set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=address")
+  endif()
+
+  option(ENABLE_MEMORY_SANITIZER "Enable memory sanitizer testing in gcc/clang" FALSE)
+  if(ENABLE_MEMORY_SANITIZER)
+    add_definitions(-fsanitize=memory -g)
+    set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=memory")
+  endif()
 endif()
+
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LINKER_FLAGS}")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LINKER_FLAGS}")
+set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${LINKER_FLAGS}")
 
 include_directories(${RUBY_INCLUDE_DIR} ${RUBY_CONFIG_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-
-if (MSVC)
-  set_target_properties(${swig_target} 
-    PROPERTIES COMPILE_FLAGS "/DSTATIC /bigobj /DBUILDING_NODE_EXTENSION /wd4996")  ## /wd4996 suppresses deprecated warnings
-elseif(UNIX)
-  set_source_files_properties( EmbeddedScriptingRUBY_wrap.cxx
-    PROPERTIES COMPILE_FLAGS "-DSTATIC -Wno-deprecated-declarations")
-endif()
 
 
 add_custom_command(
@@ -146,7 +154,17 @@ add_custom_command(
           -o "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedScriptingRUBY_wrap.cxx"
           "${CMAKE_CURRENT_SOURCE_DIR}/EmbeddedScripting.i"
   DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/EmbeddedScripting.i"
+          "embedded_files.hpp"
 )
+
+#if (MSVC)
+#  set_source_files_properties( EmbeddedScriptingRUBY_wrap.cxx 
+#    PROPERTIES COMPILE_FLAGS "/DSTATIC /bigobj /wd4996")  ## /wd4996 suppresses deprecated warnings
+#elseif(UNIX)
+#  set_source_files_properties( EmbeddedScriptingRUBY_wrap.cxx
+#    PROPERTIES COMPILE_FLAGS "-DSTATIC -Wno-deprecated-declarations")
+#endif()
+
 
 
 add_executable(EmbeddedScripting
