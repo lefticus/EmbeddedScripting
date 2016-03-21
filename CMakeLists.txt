@@ -211,7 +211,7 @@ add_executable(EmbeddedScripting
  )
 
 
-if (NOT MSVC)
+if (UNIX AND NOT APPLE)
   target_link_libraries(EmbeddedScripting ${RUBY_LIBRARY}  "dl" "crypt")
 else()
   target_link_libraries(EmbeddedScripting ${RUBY_LIBRARY} )

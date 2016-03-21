@@ -21,6 +21,7 @@
 #define UTILITIES_CORE_RUBYEXCEPTION_HPP
 
 #include <stdexcept>
+#include <string>
 
 
   class RubyException : public std::runtime_error
